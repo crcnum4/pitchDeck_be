@@ -2,17 +2,25 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import passport from 'passport';
+import session from 'express-session';
 import authRoutes from './routes/authRoutes';
-import { env } from 'process';
+import './passport-setup'; 
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 app.use(express.json());
-
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your_secret',
+  resave: false,
+  saveUninitialized: false,
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use('/api/auth', authRoutes);
 
 mongoose
